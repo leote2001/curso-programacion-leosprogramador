@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 
 /*eslint-disable*/
 export async function GET(req: Request, { params }: { params: { courseEditionId: string } }) {
-    const { courseEditionId } = params;
+    const { courseEditionId } = await params;
     try {
         await connectDb();
         const existingCourseEdition = await CourseEdition.findById(courseEditionId);
@@ -88,6 +88,7 @@ export async function PUT(req: Request, { params }: { params: { courseEditionId:
     }
 }
 export async function DELETE(req: Request, { params }: { params: { courseEditionId: string } }) {
+    console.log("la cookie es: "+req.headers.get("admin_session"));
     let session;
     let errorCode = null;
     const { courseEditionId } = await params;

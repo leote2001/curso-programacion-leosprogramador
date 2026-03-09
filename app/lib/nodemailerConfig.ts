@@ -29,13 +29,13 @@ export const sendMail = async (options: {
     }
 }
 
-export const htmlTemplateWithPayLinks = (fullName: string, linkMP: string, linkPP: string) => {
+export const htmlTemplateWithPayLinks = (fullName: string, linkMP: string) => {
     return `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 16px;">
             Hola ${fullName}!
         </h2>
         <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
-            Gracias por inscribirte al curso. Aquí tienes los enlaces de pago:
+            Gracias por preinscribirte al curso. Aquí tienes el enlace de pago:
         </p>
         <h3 style="font-size: 20px; font-weight: 600; color: #1f2937; margin-top: 24px;">MercadoPago</h3>
         <p style="margin-bottom: 12px;">
@@ -43,13 +43,6 @@ export const htmlTemplateWithPayLinks = (fullName: string, linkMP: string, linkP
                 Pagar con MercadoPago
             </a>
         </p>
-        <h3 style="font-size: 20px; font-weight: 600; color: #1f2937; margin-top: 24px;">PayPal</h3>
-        <p style="margin-bottom: 12px;">
-            <a href="${linkPP}" target="_blank" style="color: #2563eb; text-decoration: underline; font-size: 16px;">
-                Pagar con PayPal
-            </a>
-        </p>
-        
         <p style="font-size: 16px; color: #374151; margin-top: 20px;">
             ¡Nos vemos en clase!
         </p>

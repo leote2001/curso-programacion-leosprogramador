@@ -20,7 +20,6 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: "No se puede realizar la inscripción." }, { status: 400 });
         }
         if (openCourseEdition.studentsQuantity >= openCourseEdition.maxStudents) return NextResponse.json({ success: false, error: "No se puede realizar la preinscripción. Ya se alcanzó la cantidad de alumnos permitida para esta edición del curso." }, { status: 400 });
-        let linkPP;
         let linkMP;
         let newInscription;
         const expiresAt = new Date();
@@ -33,13 +32,11 @@ export async function POST(req: Request) {
             Object.assign(alreadyEnrolled, inscriptionData);
             await alreadyEnrolled.save();
             linkMP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/mercadopago/pay-before?inscriptionId=${alreadyEnrolled._id}`;
-            linkPP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/paypal/pay-before?inscriptionId=${alreadyEnrolled._id}`;
-        } else {
+            } else {
         newInscription = await Inscription.create(inscriptionData);
         linkMP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/mercadopago/pay-before?inscriptionId=${newInscription._id}`;
-        linkPP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/paypal/pay-before?inscriptionId=${newInscription._id}`;
         }
-        const sendingPayLinkEmail = await sendMail({ to: data.email, subject: "Intro a la programación - Enlace de pago", html: htmlTemplateWithPayLinks(data.fullName, linkMP, linkPP) });
+        const sendingPayLinkEmail = await sendMail({ to: data.email, subject: "Intro a la programación - Enlace de pago", html: htmlTemplateWithPayLinks(data.fullName, linkMP) });
         if (!sendingPayLinkEmail.success) {
             return NextResponse.json({ success: false, error: "Error al enviar email con enlace de pago." }, { status: 400 });
         }
