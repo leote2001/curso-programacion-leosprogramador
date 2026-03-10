@@ -1,14 +1,31 @@
 /*eslint-disable*/
 import { htmlTemplateWithPayLinks, sendMail } from "@/app/lib/nodemailerConfig";
+import axios from "axios";
 import { createInscriptionSchema } from "@/app/lib/zodSchemas";
 import { connectDb } from "@/app/lib/db";
 import { Inscription } from "@/app/lib/models/inscription.model";
 import { NextResponse } from "next/server";
 import { CourseEdition } from "@/app/lib/models/courseEdition.model";
+import { recaptchaSecretKey } from "@/app/constants";
+import { checkRateLimit } from "@/app/lib/ratelimit";
+import { checkRecaptcha } from "@/app/lib/recaptcha";
 
 export async function POST(req: Request) {
     const body = await req.json();
-    const parsed = createInscriptionSchema.safeParse(body);
+    const {data: formData, token} = body;
+    if (!token) {
+        return NextResponse.json({success: false, error: "No hay token de seguridad."}, {status: 400});
+    }
+    const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const {success: rateLimitSuccess, error: rateLimitError, status: rateLimitStatus} = await checkRateLimit(ip); 
+    if (!rateLimitSuccess) {
+        return NextResponse.json({success: false, error: rateLimitError}, {status: rateLimitStatus});
+    }
+    const {success: recaptchaSuccess, error: recaptchaError, status: recaptchaStatus} = await checkRecaptcha(token, "preinscription_submit");
+    if (!recaptchaSuccess) {
+        return NextResponse.json({success: false, error: recaptchaError}, {status: recaptchaStatus});
+    }
+    const parsed = createInscriptionSchema.safeParse(formData);
     if (!parsed.success) {
         return NextResponse.json({ success: false, error: parsed.error.flatten() }, { status: 400 });
     }

@@ -1,5 +1,6 @@
 /*eslint-disable*/
 "use client";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CreateInscriptionInput, createInscriptionSchema } from "../lib/zodSchemas";
@@ -12,6 +13,7 @@ interface InscriptionFormProps {
 }
 
 export default function InscriptionForm({ openCourseEditions }: InscriptionFormProps) {
+    const {executeRecaptcha} = useGoogleReCaptcha();
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
     const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<CreateInscriptionInput>({
@@ -22,7 +24,11 @@ export default function InscriptionForm({ openCourseEditions }: InscriptionFormP
         setError("");
         setSuccess(false);
         try {
-            const response = await axios.post("/api/create-inscription", data);
+            if (!executeRecaptcha) return;
+            const token = await executeRecaptcha("preinscription_submit");
+            console.log(`Recaptcha token: ${token}`);
+            const dataAndToken = {data, token};
+            const response = await axios.post("/api/create-inscription", dataAndToken);
             reset({ courseEdition: "", fullName: "", email: "", phone: "", country: "", comment: "", expiresAt: null, paymentMessage: "", paypalOrderId: "", paymentMethod: "none", paymentStatus: "pending", paymentId: "", paymentDate: null, amountPaid: 0, currency: "none" });
             setSuccess(true);
         } catch (err: any) {
