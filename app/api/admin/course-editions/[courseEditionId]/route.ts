@@ -52,7 +52,7 @@ export async function PUT(req: Request, { params }: { params: { courseEditionId:
         const currentStatus = existingCourseEdition.status;
         const nextStatus = data.status ?? currentStatus;
         if (currentStatus === "finished" || currentStatus === "canceled") return NextResponse.json({ success: false, error: "No se pueden modificar cohortes finalizadas o canceladas." }, { status: 400 });
-        if (start >= end || start < new Date()) return NextResponse.json({ success: false, error: "La fecha de inicio tiene que ser anterior a la fecha de finalización y no ser anterior a la fecha actual." }, { status: 400 });
+        if (start >= end ) return NextResponse.json({ success: false, error: "La fecha de inicio tiene que ser anterior a la fecha de finalización." }, { status: 400 });
         if (data.status && !allowedTransitions[currentStatus].includes(data.status)) return NextResponse.json({ success: false, error: `No se puede cambiar ${currentStatus} a ${data.status}.` }, { status: 400 });
         if (currentStatus === "upcoming") {
             if (nextStatus === "open") {

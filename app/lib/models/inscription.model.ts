@@ -15,6 +15,7 @@ export interface IInscription extends Document {
   paymentId?: string;
   paymentDate?: Date;
   amountPaid: number;
+  netReceived: number;
   currency: "ARS" | "USD" | "NONE";
 
   createdAt?: string;
@@ -104,7 +105,10 @@ const inscriptionSchema = new mongoose.Schema<IInscription>(
       type: Number,
       default: 0,
     },
-
+netReceived: {
+type: Number,
+default: 0
+},
     currency: {
       type: String,
       enum: ["ARS", "USD", "NONE"],

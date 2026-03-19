@@ -32,6 +32,9 @@ export async function POST(req: Request) {
     const data = parsed.data;
     try {
         await connectDb();
+        const alreadyEnrolled = await Inscription.findOne({ email: data.email, courseEdition: data.courseEdition});
+        if (alreadyEnrolled?.paymentStatus === "approved") return NextResponse.json({success: false, error: "No es posible preinscribir nuevamente. Inscripción ya abonada."}, {status: 400});
+        if (alreadyEnrolled?.expiresAt > new Date()) return NextResponse.json({success: false, error: "Ya hay una preinscripción registrada con el correo electrónico ingresado."}, {status: 400});
         const openCourseEdition = await CourseEdition.findOne({ _id: data.courseEdition, status: "open" });
         if (!openCourseEdition) {
             return NextResponse.json({ success: false, error: "No se puede realizar la inscripción." }, { status: 400 });
@@ -39,13 +42,12 @@ export async function POST(req: Request) {
         if (openCourseEdition.studentsQuantity >= openCourseEdition.maxStudents) return NextResponse.json({ success: false, error: "No se puede realizar la preinscripción. Ya se alcanzó la cantidad de alumnos permitida para esta edición del curso." }, { status: 400 });
         let linkMP;
         let newInscription;
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + 48);
+        const expiresAt = new Date(Date.now() + 1000*60*20); 
+        console.log(`Expiracion en milisegundos: ${expiresAt}`);
+        //expiresAt.setHours(expiresAt.getHours() + 48);
         const inscriptionData = { ...data, priceARS: openCourseEdition.priceARS, priceUSD: openCourseEdition.priceUSD, expiresAt, paymentStatus: "pending", paymentMessage: "", paymentId: "", amountPaid: 0, paymentMethod: "none", currency: "NONE" };
-        const alreadyEnrolled = await Inscription.findOne({ email: data.email, courseEdition: openCourseEdition._id });
+        console.log(`La inscripción expira en: ${expiresAt.getTime()*1000 / 60} minutos.`);
         if (alreadyEnrolled) {
-            const isExpired = alreadyEnrolled.paymentStatus !== "approved" && alreadyEnrolled.expiresAt < new Date(); 
-            if (!isExpired) return NextResponse.json({success: false, error: "Ya existe una inscripción activa."}, {status: 400});
             Object.assign(alreadyEnrolled, inscriptionData);
             await alreadyEnrolled.save();
             linkMP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/mercadopago/pay-before?inscriptionId=${alreadyEnrolled._id}`;

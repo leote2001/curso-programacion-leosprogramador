@@ -27,8 +27,7 @@ export default function InscriptionForm({ openCourseEditions }: InscriptionFormP
             if (!executeRecaptcha) return;
             const token = await executeRecaptcha("preinscription_submit");
             console.log(`Recaptcha token: ${token}`);
-            const dataAndToken = {data, token};
-            const response = await axios.post("/api/create-inscription", dataAndToken);
+            const response = await axios.post("/api/create-inscription", {data, token});
             reset({ courseEdition: "", fullName: "", email: "", phone: "", country: "", comment: "", expiresAt: null, paymentMessage: "", paypalOrderId: "", paymentMethod: "none", paymentStatus: "pending", paymentId: "", paymentDate: null, amountPaid: 0, currency: "none" });
             setSuccess(true);
         } catch (err: any) {
