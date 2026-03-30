@@ -4,9 +4,10 @@ import { mp } from "@/app/lib/mercadopago";
 import { CourseEdition } from "@/app/lib/models/courseEdition.model";
 import { Inscription } from "@/app/lib/models/inscription.model";
 import { htmlTemplateForAnyEmail, sendMail } from "@/app/lib/nodemailerConfig";
-import { PaymentRefund, Payment } from "mercadopago";
+import { Payment, PaymentRefund } from "mercadopago";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+
 const paymentClient = new Payment(mp);
 const refundClient = new PaymentRefund(mp);
 export async function POST(req: Request) {
@@ -15,21 +16,22 @@ export async function POST(req: Request) {
         await connectDb();
         session = await mongoose.startSession();
         const body = await req.json();
-        if (!body || !body.data) {
-            console.warn("MPWebhook: no hay body o body.data."); 
+        console.log("El body: ",body)
+        const {id} = body.data;
+        if (!id) throw new Error("No hay id.")
+        const paymentId = id;
+        console.log("El paymentId: "+paymentId)
+        
+        
+        
+        const payment = await paymentClient.get({id: paymentId})
+        
+        if (payment?.status !== "approved") {
+            console.log("MPWebhook: el pago no se aprobó.");
             return NextResponse.json(null, {status: 200});
         }
-        const { id } = body.data;
-        if (!id) {
-            throw new Error("MP: no se pudo obtener id de pago.");
-        }
-        const paymentId = id;
-        const payment = await paymentClient.get({ id: paymentId });
-        if (payment?.status !== "approved") {
-            throw new Error("MP: el pago no pudo ser procesado por Mercadopago.");
-        }
-        if (!payment.external_reference) {
-            throw new Error("MP: no se pudo obtener external_reference.");
+        if (!payment?.external_reference) {
+        throw new Error("MPWebhook: no se encontró external_reference en payment.");
         }
         const inscriptionId = payment.external_reference;
         session.startTransaction();
@@ -45,30 +47,23 @@ export async function POST(req: Request) {
         }
         const courseEdition = await CourseEdition.findById(inscription.courseEdition).session(session);
         let rejectReason = "";
-        if (!courseEdition || courseEdition.status !== "open") {
-            rejectReason = "No se encontró cohorte o las incscripciones están cerradas. Se devolvió el dinero.";
+        if (!courseEdition || courseEdition.studentsQuantity >= courseEdition.maxStudents) {
+            rejectReason = "Cupo completo o edición de curso no encontrada.";
         } else if (inscription.expiresAt < new Date()) {
-            rejectReason = "Inscripción expirada. Se devolvió el dinero.";
-        } else if (Number(payment.transaction_amount) != Number(inscription.priceARS) || payment.currency_id != "ARS") {
-            rejectReason = "Monto incorrecto. Se devolvió el dinero.";
+            rejectReason = "Inscripción expirada.";
+        } else if (Number(payment.transaction_amount) != Number(inscription.priceARS) || payment.currency_id?.toString() != inscription.currency.toString()) {
+            rejectReason = "Monto incorrecto o moneda equivocada.";
+        } else {
+            const updateCourseEdition = await CourseEdition.findOneAndUpdate({ _id: inscription.courseEdition, studentsQuantity: { $lt: courseEdition.maxStudents } }, { $inc: { studentsQuantity: 1 } }, { session, new: true });
+            if (!updateCourseEdition) rejectReason = "Cupo completo: no se pudo inscribir al usuario.";
         }
         if (rejectReason) {
             inscription.paymentStatus = "rejected";
             inscription.paymentMessage = rejectReason;
-            await inscription.save({session});
-            await refundClient.create({payment_id: paymentId, requestOptions: {idempotencyKey: `refund-${paymentId}`}});
-            await session.commitTransaction();
-            console.log("MP: se devolvió dinero. Razón: "+rejectReason);
-            return NextResponse.json(null, {status: 200});
-        }
-        const updatedCourseEdition = await CourseEdition.findOneAndUpdate({ _id: inscription.courseEdition, studentsQuantity: { $lt: courseEdition?.maxStudents } }, { $inc: { studentsQuantity: 1 } }, { session, new: true });
-        if (!updatedCourseEdition) {
-            inscription.paymentStatus = "rejected";
-            inscription.paymentMessage = "Cupo completo. Se devolvió dinero.";
             await inscription.save({ session });
-            await refundClient.create({ payment_id: paymentId, requestOptions: {idempotencyKey: `refund-${paymentId}`} });
+            //await refundClient.create({ payment_id: paymentId, requestOptions: { idempotencyKey: `refund-${paymentId}` } });
             await session.commitTransaction();
-            console.warn("MP: se devolvió dinero. Razón: Cupo completo.");
+            console.log("Se devolvió dinero: " + rejectReason);
             return NextResponse.json(null, { status: 200 });
         }
         inscription.paymentMethod = "mercadopago";
@@ -89,11 +84,11 @@ export async function POST(req: Request) {
         } else {
             console.log(`MPWebhook: ${sendMailMessage}`);
         }
-        return NextResponse.json(null, { status: 200 }); 
+        return NextResponse.json(null, { status: 200 });
     } catch (err: any) {
-        console.error(`Error en webhook de mercadopago: ${err}`);
+        console.error(`Error en webhook de Mercadopago: `,err);
         if (session && session.transaction && session.transaction.isActive) {
-        await session?.abortTransaction();
+            await session.abortTransaction();
         }
         return NextResponse.json(null, { status: 200 });
     } finally {
