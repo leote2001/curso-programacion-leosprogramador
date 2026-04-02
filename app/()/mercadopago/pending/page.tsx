@@ -1,7 +1,7 @@
 export default function PendingPage() {
     return (
         <>
- <h2>Pending</h2>       
+ <h2>Pendiente de pago.</h2>       
         </>
     );
 }

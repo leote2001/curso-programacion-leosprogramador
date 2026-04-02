@@ -2,17 +2,18 @@
 import { connectDb } from "@/app/lib/db";
 import { CourseEdition } from "@/app/lib/models/courseEdition.model";
 import InscriptionForm from "@/app/components/InscriptionForm";
+import { getOpenCourseEditions } from "@/app/actions";
 
 export default async function Inscription() {
   let courseEditions: any[] = [];
   let error = "";
   let openCourseEditions: any[] = [];
   try {
-    await connectDb();
-    courseEditions = await CourseEdition.find({ status: "open" }).lean();
-    if (courseEditions.length > 0) {
-      openCourseEditions = courseEditions.map(ce => ({ _id: ce._id.toString(), name: ce.name, startDate: ce.startDate.toISOString(), startTime: ce.startTime, priceARS: ce.priceARS, priceUSD: ce.priceUSD }));
+    const {success: oCourseEditionsSuccess, courseEditions: oCourseEditions, error: oCourseEditionsError} = await getOpenCourseEditions();
+    if (!oCourseEditionsSuccess) {
+      throw new Error(oCourseEditionsError);
     }
+    openCourseEditions = oCourseEditions;
   } catch (err: any) {
     console.error("Error en la página del formulario de inscripción: " + err);
     error = err.message;

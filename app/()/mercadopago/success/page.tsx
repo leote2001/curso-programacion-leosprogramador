@@ -1,7 +1,7 @@
 export default function SuccessPage() {
     return (
         <>
-<h2>Success!</h2>
+<h2>Confirmando inscripción. Revisa el email que te hemos enviado.</h2>
 </>
     );
 }

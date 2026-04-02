@@ -4,12 +4,12 @@ import { Redis } from "@upstash/redis";
 export const redis = Redis.fromEnv();
 export const minuteRateLimit = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(10, "1 m"),
+    limiter: Ratelimit.slidingWindow(5, "1 m"),
     prefix: "cursoIntroProg/minute"
 });
 export const dayRateLimit = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(30, "24 h"),
+    limiter: Ratelimit.slidingWindow(20, "24 h"),
     prefix: "cursoIntroProg/day"
 });
 export const checkRateLimit = async (ip: string) => {

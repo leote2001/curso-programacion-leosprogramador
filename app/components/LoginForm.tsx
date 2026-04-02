@@ -3,16 +3,20 @@
 import { FormEvent, useState } from "react";
 import { axiosReq } from "../constants";
 import { useRouter } from "next/navigation";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 export default function LoginForm() {
+    const {executeRecaptcha} = useGoogleReCaptcha();
     const router = useRouter();
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        if (!executeRecaptcha) return;
         setError("");
         try {
-            const response = await axiosReq.post("/api/admin/login", {password});
+            const token = await executeRecaptcha("login_submit");
+            const response = await axiosReq.post("/api/admin/login", {password, token});
             router.push("/admin/dashboard");
         } catch (err: any) {
             setError(err.response.data.error || "Error en la contraseña para iniciar sesión.");
