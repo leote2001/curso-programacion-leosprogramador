@@ -1,6 +1,7 @@
+import Landing from "../components/Landing";
 
-export default function Home() {
-  return (
-    <p>Esta es la landingPage (home)</p>
-      );
+export default function LandingPage() {
+    return (
+<Landing />
+    );
 }

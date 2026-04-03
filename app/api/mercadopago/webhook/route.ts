@@ -83,7 +83,7 @@ export async function POST(req: Request) {
         await session.commitTransaction();
         console.log("Se confirmó el pago para el alumno " + inscription.fullName + ". El id de pago es: " + paymentId + ". Enviando correo de confirmación...");
         const message = "Inscripción confirmada. En breve recibirás un correo con la info necesaria para poder acceder a las clases. Saludos!";
-        const { error: sendMailError, success, message: sendMailMessage } = await sendMail({ to: inscription.email, subject: "Intro a la Programación - Confirmación de Inscripción", html: htmlTemplateForAnyEmail(inscription.fullName, message) });
+        const { error: sendMailError, success, message: sendMailMessage } = await sendMail({ to: inscription.email, subject: "Curso Programación Desde Cero + IA - Confirmación de Inscripción", html: htmlTemplateForAnyEmail(inscription.fullName, message) });
         if (!success) {
             console.warn(`MPWebhook: ${sendMailError}`);
         } else {

@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     description: "Aprende los fundamentos de la programación y el uso de la IA.",
     url: process.env.NEXT_PUBLIC_FRONTEND_BASE_URL,
     type: "website",
+    images: [`${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/api/og`],
     locale: "es_AR",
     siteName: "Leo S Programador"
   }

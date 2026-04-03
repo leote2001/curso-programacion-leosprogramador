@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ShareButtons } from "../components/ShareButtons";
+import SocialMediaLinks from "../components/SocialMediaLinks";
+import About from "../components/About";
 export default function PublicLayout({
   children,
 }: Readonly<{
@@ -12,14 +14,18 @@ export default function PublicLayout({
           <nav>
             <Link href={"/"}>Inicio</Link>
             <Link href={"/preinscription"}>Preinscripción</Link>
+            <a target="_blank" href="https://leosprogramador.portfolio-ls.online">Leo S Programador</a>
           </nav>
         </header>
         <main>
         {children}
         </main>
         <footer>
+          <About />
+          <SocialMediaLinks />
+          <hr />
           <h2>Compartir</h2>
-          <ShareButtons url={process.env.NEXT_PUBLIC_FRONTEND_BASE_URL as string} title="Curso Programación Desde Cero + IA" />
+          <ShareButtons />
           <p>Copyright &copy;{new Date().getFullYear()}. Desarrollado por <a target="_blank" href="https://leosprogramador.portfolio-ls.online"><b>Leo S Programador</b></a>.</p>
         </footer>
 </>      

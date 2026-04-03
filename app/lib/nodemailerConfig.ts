@@ -19,7 +19,7 @@ export const sendMail = async (options: {
     try {
         // Al pasar ...options, Nodemailer recibe la propiedad 'html' correctamente
         await transporter.sendMail({ 
-            from: `"Intro a la programación" <${process.env.EMAIL_USER}>`, 
+            from: `"Curso Programación Desde Cero + IA - Leo S Programador" <${process.env.EMAIL_USER}>`, 
             ...options 
         });
         return { success: true, message: "Se envió email al estudiante." };

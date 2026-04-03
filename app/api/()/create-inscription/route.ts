@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         newInscription = await Inscription.create(inscriptionData);
         linkMP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/mercadopago/pay-before?inscriptionId=${newInscription._id}`;
         }
-        const sendingPayLinkEmail = await sendMail({ to: data.email, subject: "Intro a la programación - Enlace de pago", html: htmlTemplateWithPayLinks(data.fullName, linkMP) });
+        const sendingPayLinkEmail = await sendMail({ to: data.email, subject: "Curso Programación Desde Cero + IA - Enlace de pago", html: htmlTemplateWithPayLinks(data.fullName, linkMP) });
         if (!sendingPayLinkEmail.success) {
             return NextResponse.json({ success: false, error: "Error al enviar email con enlace de pago." }, { status: 400 });
         }
