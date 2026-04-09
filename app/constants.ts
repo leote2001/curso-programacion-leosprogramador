@@ -7,3 +7,5 @@ export const axiosReq = axios.create({
 
 export const publicRecaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_KEY as string;
 export const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY as string;
+export const coursePrice = 40000;
+export const priceWithDiscount = coursePrice - (coursePrice * 0.30);

@@ -33,7 +33,7 @@ export const getOpenCourseEditions = async () => {
         const gettingCourseEditions = await CourseEdition.find({ status: "open" }).lean();
         console.log("Se obtuvieron las cohortes con inscripciones abiertas.");
         if (gettingCourseEditions.length > 0) {
-            courseEditions = gettingCourseEditions.map(ce => ({ _id: ce._id, name: ce.name, startDate: new Date(ce.startDate).toLocaleDateString("es-ar", {timeZone: "utc"}), startTime: ce.startTime, priceARS: ce.priceARS, priceUSD: ce.priceUSD }));
+            courseEditions = gettingCourseEditions.map(ce => ({ _id: ce._id, name: ce.name, startDate: new Date(ce.startDate).toLocaleDateString("es-AR", {timeZone: "America/Argentina/Buenos_Aires", weekday: "long", day: "numeric", month: "long", year: "numeric"}), startTime: ce.startTime, priceARS: ce.priceARS}));
         }
         return { success: true, message: "Se obtuvieron las cohortes con inscripciones abiertas.", courseEditions: JSON.parse(JSON.stringify(courseEditions)) };
     } catch (err: any) {

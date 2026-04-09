@@ -14,7 +14,7 @@ return (
   <select {...register("courseEdition")} id="courseEdition">
     <option value="">Elige</option>  
     {openCourseEditions.map(oce => (
-        <option key={oce._id} value={oce._id}>{oce.name} - Inicia: {oce.startDate} - Hora: {oce.startTime} - Precio en pesos argentinos: {oce.priceARS} - Precio en dólares: {oce.priceUSD}</option>
+        <option key={oce._id} value={oce._id}>{oce.name} - Inicia: {oce.startDate} - Hora: {oce.startTime} - Precio: ${oce.priceARS}ARS</option>
     ))}
     </select>
     {errors.courseEdition && <p role="alert" aria-live="assertive">{errors.courseEdition.message}</p>}

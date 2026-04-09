@@ -14,12 +14,14 @@ export default function PublicLayout({
           <nav>
             <Link href={"/"}>Inicio</Link>
             <Link href={"/preinscription"}>Preinscripción</Link>
+            <Link href={"/faq"}>Preguntas frecuentes</Link>
             <a target="_blank" href="https://leosprogramador.portfolio-ls.online">Leo S Programador</a>
           </nav>
         </header>
         <main>
         {children}
         </main>
+        <hr />
         <footer>
           <About />
           <SocialMediaLinks />
