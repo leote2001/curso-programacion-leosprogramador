@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 export async function changeCourseEditionStatus(courseEditionId: string, status: string) {
     try {
         console.log("Valor de status: " + status);
-        const response = await axiosReq.put(`${process.env.API_BASE_URL}/api/admin/course-editions/${courseEditionId}`, { status });
+        const response = await axiosReq.put(`${process.env.API_BASE_URL}/api/admin/course-editions/${courseEditionId}`, { status: status });
         console.log("La cohorte actualizada: " + response.data.updatedCourseEdition.status + ", cantidad de alumnos: " + response.data.updatedCourseEdition.studentsQuantity);
         revalidatePath("/admin/dashboard");
         return { success: true, message: "Cohorte actualizada!" };

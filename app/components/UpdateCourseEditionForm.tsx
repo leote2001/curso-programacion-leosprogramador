@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { UpdateCourseEditionInput, updateCourseEditionSchema } from "../lib/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { axiosReq } from "../constants";
+import { axiosReq, priceWithDiscount } from "../constants";
 import { useRouter } from "next/navigation";
+import { number } from "zod";
 interface UpdateCourseEditionFormProps {
     courseEdition: any;
 }
@@ -16,7 +17,7 @@ export default function UpdateCourseEditionForm({ courseEdition }: UpdateCourseE
     const [alert, setAlert] = useState("");
     const { register, handleSubmit, formState: { errors } } = useForm<UpdateCourseEditionInput>({
         resolver: zodResolver(updateCourseEditionSchema),
-        defaultValues: {...courseEdition, startDate: courseEdition.startDate.split("T")[0], endDate: courseEdition.endDate.split("T")[0]}
+        defaultValues: {...courseEdition, startDate: courseEdition.startDate.split("T")[0], endDate: courseEdition.endDate.split("T")[0], priceUSD: 0}
     });
     const onSubmit = async (data: UpdateCourseEditionInput) => {
         setAlert("");
@@ -54,30 +55,17 @@ export default function UpdateCourseEditionForm({ courseEdition }: UpdateCourseE
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Precios */}
                     <div>
-                        <label htmlFor="priceARS" className="block text-sm font-medium mb-1">Precio ARS</label>
-                        <input
+                        <label htmlFor="priceARS">Precio</label>
+                        <input type="number" 
                         disabled={disabledFieldIf}
-                            id="priceARS"
-                            type="number"
-                            {...register("priceARS", { valueAsNumber: true })}
-                            className="w-full p-2 border rounded-md outline-none"
+                        id="priceARS"
+                        {...register("priceARS", {valueAsNumber: price})}
                         />
-                        {errors.priceARS && <p role="alert" aria-live="assertive" className="text-red-500 text-xs mt-1">{errors.priceARS.message}</p>}
+                        {errors.priceARS && <p>{errors.priceARS.message}</p>}
                     </div>
 
-                    <div>
-                        <label htmlFor="priceUSD" className="block text-sm font-medium mb-1">Precio USD</label>
-                        <input
-                        disabled={disabledFieldIf}
-                            id="priceUSD"
-                            type="number"
-                            {...register("priceUSD", { valueAsNumber: true })}
-                            className="w-full p-2 border rounded-md outline-none"
-                        />
-                        {errors.priceUSD && <p role="alert" aria-live="assertive" className="text-red-500 text-xs mt-1">{errors.priceUSD.message}</p>}
-                    </div>
+                    
 
                     {/* Fechas */}
                     <div>

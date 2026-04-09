@@ -3,7 +3,7 @@
 import { CreateCourseEditionInput, createCourseEditionSchema } from "../lib/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { axiosReq } from "../constants";
+import { axiosReq, priceWithDiscount } from "../constants";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 export default function CreateCourseEditionForm() {
@@ -12,7 +12,7 @@ export default function CreateCourseEditionForm() {
   const [error, setError] = useState<string[]>([]);
   const { register, handleSubmit, formState: { errors } } = useForm<CreateCourseEditionInput>({
     resolver: zodResolver(createCourseEditionSchema),
-    defaultValues: { status: "upcoming", googleMeetUrl: "https://" }
+    defaultValues: {priceUSD: 0, priceARS: priceWithDiscount, status: "upcoming", googleMeetUrl: "https://" }
   });
   const onSubmit = async (data: CreateCourseEditionInput) => {
     setError([]);
@@ -49,29 +49,6 @@ export default function CreateCourseEditionForm() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Precios */}
-          <div>
-            <label htmlFor="priceARS" className="block text-sm font-medium mb-1">Precio ARS</label>
-            <input
-              id="priceARS"
-              type="number"
-              {...register("priceARS", { valueAsNumber: true })}
-              className="w-full p-2 border rounded-md outline-none"
-            />
-            {errors.priceARS && <p role="alert" aria-live="assertive" className="text-red-500 text-xs mt-1">{errors.priceARS.message}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="priceUSD" className="block text-sm font-medium mb-1">Precio USD</label>
-            <input
-              id="priceUSD"
-              type="number"
-              {...register("priceUSD", { valueAsNumber: true })}
-              className="w-full p-2 border rounded-md outline-none"
-            />
-            {errors.priceUSD && <p role="alert" aria-live="assertive" className="text-red-500 text-xs mt-1">{errors.priceUSD.message}</p>}
-          </div>
-
           {/* Fechas */}
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium mb-1">Fecha de Inicio</label>
