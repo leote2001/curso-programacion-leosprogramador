@@ -60,7 +60,7 @@ export default function UpdateCourseEditionForm({ courseEdition }: UpdateCourseE
                         <input type="number" 
                         disabled={disabledFieldIf}
                         id="priceARS"
-                        {...register("priceARS", {valueAsNumber: price})}
+                        {...register("priceARS", {valueAsNumber: true})}
                         />
                         {errors.priceARS && <p>{errors.priceARS.message}</p>}
                     </div>
