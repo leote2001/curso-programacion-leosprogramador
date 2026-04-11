@@ -71,7 +71,10 @@ export default function InscriptionForm({ openCourseEditions }: InscriptionFormP
                             <label htmlFor="comment">Comentario</label>
                             <textarea placeholder="Si lo deseas puedes dejar un comentario" id="comment" {...register("comment")}></textarea>
                         </div>
+                        <p>* Al hacer clic en el botón Enviar se te enviará un correo electrónico con un enlace para que puedas abonar el curso. Luego de aprobado el pago tu inscripción quedará confirmada.</p>
+                        <div>
                         <button role="alert" aria-live="assertive" disabled={isSubmitting} type="submit">{!isSubmitting ? "Enviar" : "Enviando..."}</button>
+                        </div>
                     </form>
                     {error &&
                     <p role="alert" aria-live="assertive">{error}</p>

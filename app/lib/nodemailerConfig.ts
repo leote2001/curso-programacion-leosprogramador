@@ -29,14 +29,19 @@ export const sendMail = async (options: {
     }
 }
 
-export const htmlTemplateWithPayLinks = (fullName: string, linkMP: string) => {
+export const htmlTemplateWithPayLinks = (fullName: string, linkMP: string, courseEdition: any) => {
     return `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 16px;">
             Hola ${fullName}!
         </h2>
         <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
-            Gracias por preinscribirte al curso. Aquí tienes el enlace de pago:
+            Gracias por preinscribirte. Una vez que abones el curso tu inscripción quedará confirmada. A continuación los detalles y el enlace de pago de Mercadopago:
         </p>
+        <p><strong>Título: </strong>${courseEdition.name}</p>
+        <p><strong>Duración: </strong>6 semanas</p>
+        <p><strong>Inicia: </strong>${new Date(courseEdition.startDate).toLocaleDateString("es-AR", {weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "utc"})}</p>
+        <p><strong>Precio: </strong>'$'${courseEdition.priceARS}ARS</p>
+        <p><strong>Hora: </strong>${courseEdition.startTime}hs</p>
         <h3 style="font-size: 20px; font-weight: 600; color: #1f2937; margin-top: 24px;">MercadoPago</h3>
         <p style="margin-bottom: 12px;">
             <a href="${linkMP}" target="_blank" style="color: #2563eb; text-decoration: underline; font-size: 16px;">
