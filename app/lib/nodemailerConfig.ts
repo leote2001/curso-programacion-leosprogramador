@@ -40,14 +40,15 @@ export const htmlTemplateWithPayLinks = (fullName: string, linkMP: string, cours
         <p><strong>Título: </strong>${courseEdition.name}</p>
         <p><strong>Duración: </strong>6 semanas</p>
         <p><strong>Inicia: </strong>${new Date(courseEdition.startDate).toLocaleDateString("es-AR", {weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "utc"})}</p>
-        <p><strong>Precio: </strong>'$'${courseEdition.priceARS}ARS</p>
+        <p><strong>Precio: </strong>$${courseEdition.priceARS}ARS</p>
         <p><strong>Hora: </strong>${courseEdition.startTime}hs</p>
         <h3 style="font-size: 20px; font-weight: 600; color: #1f2937; margin-top: 24px;">MercadoPago</h3>
         <p style="margin-bottom: 12px;">
             <a href="${linkMP}" target="_blank" style="color: #2563eb; text-decoration: underline; font-size: 16px;">
-                Pagar con MercadoPago
+                Pagar con MercadoPago (abre en una nueva ventana)
             </a>
         </p>
+        <p><b>* El enlace de pago solo funcionará durante 48 horas desde que se recibió este correo. Si al hacer clic en el enlace aparece un mensaje indicando que la inscripción ya expiró, deberás llenar nuevamente el formulario de preinscripción.</b></p>
         <p style="font-size: 16px; color: #374151; margin-top: 20px;">
             ¡Nos vemos en clase!
         </p>

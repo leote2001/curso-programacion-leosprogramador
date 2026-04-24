@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { connectDb } from "@/app/lib/db";
 import { CourseEdition } from "@/app/lib/models/courseEdition.model";
 import { Inscription } from "@/app/lib/models/inscription.model";
+import ExpiredInscriptionError from "@/app/components/ExpiredInscriptionError";
 
 /*eslint-disable*/
 interface CreateMPPayLinkProps {
@@ -28,8 +29,7 @@ export default async function CreateMPPayLink({ searchParams }: CreateMPPayLinkP
             return <h2>{error}</h2>
         }
         if (inscription.expiresAt.getTime() < Date.now()) {
-            error = "Inscripción ya expirada";
-            return <h2>{error}</h2>
+            return<ExpiredInscriptionError />
         }
         const courseEdition = await CourseEdition.findById(inscription.courseEdition);
         if (!courseEdition) {

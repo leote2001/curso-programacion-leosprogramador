@@ -5,8 +5,8 @@ import { Inscription } from "@/app/lib/models/inscription.model";
 import { updateInscriptionSchema } from "@/app/lib/zodSchemas";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { inscriptionId: string; } }) {
-    const { inscriptionId } = params;
+export async function GET(req: Request, { params }: { params: Promise<{ inscriptionId: string; }> }) {
+    const { inscriptionId } = await params;
     try {
         await connectDb();
         const existingInscription = await Inscription.findById(inscriptionId).populate("courseEdition");
@@ -20,8 +20,8 @@ export async function GET(req: Request, { params }: { params: { inscriptionId: s
         return NextResponse.json({ success: false, error: "Error inesperado al obtener inscripción por id." }, { status: 500 });
     }
 }
-export async function PUT(req: Request, { params }: { params: { inscriptionId: string; } }) {
-    const { inscriptionId } = params;
+export async function PUT(req: Request, { params }: { params: Promise<{ inscriptionId: string; }> }) {
+    const { inscriptionId } = await params;
     const body = await req.json();
     const parsed = updateInscriptionSchema.safeParse(body);
     if (!parsed.success) {
@@ -44,8 +44,8 @@ export async function PUT(req: Request, { params }: { params: { inscriptionId: s
         return NextResponse.json({ success: false, error: "Error inesperado al actualizar inscripción." }, { status: 500 });
     }
 }
-export async function DELETE(req: Request, { params }: { params: { inscriptionId: string; } }) {
-    const { inscriptionId } = params;
+export async function DELETE(req: Request, { params }: { params: Promise<{ inscriptionId: string; }> }) {
+    const { inscriptionId } = await params;
     try {
         await connectDb();
         const existingInscription = await Inscription.findById(inscriptionId);

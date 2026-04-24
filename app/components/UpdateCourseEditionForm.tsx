@@ -55,18 +55,6 @@ export default function UpdateCourseEditionForm({ courseEdition }: UpdateCourseE
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label htmlFor="priceARS">Precio</label>
-                        <input type="number" 
-                        disabled={disabledFieldIf}
-                        id="priceARS"
-                        {...register("priceARS", {valueAsNumber: true})}
-                        />
-                        {errors.priceARS && <p>{errors.priceARS.message}</p>}
-                    </div>
-
-                    
-
                     {/* Fechas */}
                     <div>
                         <label htmlFor="startDate" className="block text-sm font-medium mb-1">Fecha de Inicio</label>

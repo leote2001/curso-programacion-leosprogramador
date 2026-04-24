@@ -1,6 +1,6 @@
 /*eslint-disable*/
 import { connectDb } from "@/app/lib/db";
-import { mp } from "@/app/lib/mercadopago";
+import { mp, verifyMercadoPagoWebhook } from "@/app/lib/mercadopago";
 import { CourseEdition } from "@/app/lib/models/courseEdition.model";
 import { Inscription } from "@/app/lib/models/inscription.model";
 import { htmlTemplateForAnyEmail, sendMail } from "@/app/lib/nodemailerConfig";
@@ -12,11 +12,20 @@ const refundClient = new PaymentRefund(mp);
 export async function POST(req: Request) {
     let session;
     try {
+        const body = await req.json();
+        const dataId = body.data.id;
+        const requestId = req.headers.get("x-request-id")!;
+        const signature = req.headers.get("x-signature")!;
+        const secret = process.env.MP_WEBHOOK_SECRET as string;
+        const isValid = verifyMercadoPagoWebhook(signature, requestId, dataId, secret);
+        if (!isValid) {
+            console.warn("MPWebhook: webhook sospechoso. No se pudo verificar correctamente.");
+            return NextResponse.json(null, {status: 200});
+        }
         await connectDb();
         session = await mongoose.startSession();
-        const body = await req.json();
         if (!body || !body.data) {
-            console.warn("MPWebhook: no hay body o body.data."); 
+            //console.warn("MPWebhook: no hay body o body.data."); 
             return NextResponse.json(null, {status: 200});
         }
         const { id } = body.data;
@@ -38,13 +47,16 @@ export async function POST(req: Request) {
             await refundClient.create({ payment_id: paymentId, requestOptions: { idempotencyKey: `refund-${paymentId}` } });
             throw new Error("MPWebhook: se devolvió dinero porque no se encontró inscripción.");
         }
-        if (inscription.paymentStatus === "approved") {
-            console.warn("MPWebhook: se ignora notificación. Pago ya procesado.");
-            await session.abortTransaction();
-            return NextResponse.json(null, { status: 200 });
-        }
-        const courseEdition = await CourseEdition.findById(inscription.courseEdition).session(session);
         let rejectReason = "";
+        if (inscription.paymentStatus === "approved") {
+            console.warn("MPWebhook: se procesó un pago para una inscripción que ya se pagó. Se devolverá el dinero.");
+            await refundClient.create({payment_id: paymentId, requestOptions: {idempotencyKey: `refund-${paymentId}`}});
+            console.warn("MPWebhook: se devolvió dinero.");
+            await session.abortTransaction();
+            return NextResponse.json(null, {status: 200});
+            }
+        const courseEdition = await CourseEdition.findById(inscription.courseEdition).session(session);
+        
         if (!courseEdition || courseEdition.status !== "open") {
             rejectReason = "No se encontró cohorte o las incscripciones están cerradas. Se devolvió el dinero.";
         } else if (inscription.expiresAt < new Date()) {
@@ -91,7 +103,7 @@ export async function POST(req: Request) {
         }
         return NextResponse.json(null, { status: 200 }); 
     } catch (err: any) {
-        console.error(`Error en webhook de mercadopago: ${err}`);
+        console.error(`Error en webhook de mercadopago: `,err);
         if (session && session.transaction && session.transaction.isActive) {
         await session?.abortTransaction();
         }

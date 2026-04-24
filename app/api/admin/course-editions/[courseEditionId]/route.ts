@@ -6,7 +6,7 @@ import {Inscription} from "@/app/lib/models/inscription.model";
 import { NextResponse } from "next/server";
 
 /*eslint-disable*/
-export async function GET(req: Request, { params }: { params: { courseEditionId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ courseEditionId: string }> }) {
     const { courseEditionId } = await params;
     try {
         await connectDb();
@@ -21,7 +21,7 @@ export async function GET(req: Request, { params }: { params: { courseEditionId:
         return NextResponse.json({ success: false, error: "Error inesperado al obtener cohorte." }, { status: 500 });
     }
 }
-export async function PUT(req: Request, { params }: { params: { courseEditionId: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ courseEditionId: string }> }) {
     let preParsed;
     const { courseEditionId } = await params;
     const body = await req.json();
@@ -87,7 +87,7 @@ export async function PUT(req: Request, { params }: { params: { courseEditionId:
         return NextResponse.json({ success: false, error: "Error inesperado al actualizar cohorte." }, { status: 500 });
     }
 }
-export async function DELETE(req: Request, { params }: { params: { courseEditionId: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ courseEditionId: string }> }) {
     console.log("la cookie es: "+req.headers.get("admin_session"));
     let session;
     let errorCode = null;

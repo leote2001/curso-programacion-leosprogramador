@@ -5,8 +5,8 @@ import { Inscription } from "@/app/lib/models/inscription.model";
 import { NextResponse } from "next/server";
 
 /*eslint-disable*/
-export async function GET(req: Request, { params }: { params: { inscriptionId: string } }) {
-    const { inscriptionId } = params;
+export async function GET(req: Request, { params }: { params: Promise<{ inscriptionId: string }> }) {
+    const { inscriptionId } = await params;
     try {
         await connectDb();
         const existingInscription = await Inscription.findById(inscriptionId);

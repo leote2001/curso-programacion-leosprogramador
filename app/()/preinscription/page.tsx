@@ -3,7 +3,7 @@ import { connectDb } from "@/app/lib/db";
 import { CourseEdition } from "@/app/lib/models/courseEdition.model";
 import InscriptionForm from "@/app/components/InscriptionForm";
 import { getOpenCourseEditions } from "@/app/actions";
-
+export const dynamic = "force-dynamic";
 export default async function Inscription() {
   let courseEditions: any[] = [];
   let error = "";

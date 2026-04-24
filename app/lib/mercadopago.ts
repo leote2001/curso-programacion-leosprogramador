@@ -1,4 +1,5 @@
 /*eslint-disable*/
+import crypto from "crypto";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export const mp = new MercadoPagoConfig({
@@ -29,4 +30,38 @@ export const createMPPreferenceAndReturnPayLink = async (inscriptionInfo: { insc
         console.error("Error al crear preferencia: "+err);
         return {success: false, error: err.message};
     }   
-} 
+}
+
+export const verifyMercadoPagoWebhook = (
+  signature: string,
+  requestId: string,
+  dataId: string,
+  secret: string
+) => {
+  try {
+    const parts = signature.split(",");
+
+    let ts = "";
+    let hash = "";
+
+    for (const part of parts) {
+      const [key, value] = part.split("=");
+      if (key === "ts") ts = value;
+      if (key === "v1") hash = value;
+    }
+
+    if (!ts || !hash) return false;
+
+    const manifest = `id:${dataId};request-id:${requestId};ts:${ts};`;
+
+    const hmac = crypto.createHmac("sha256", secret);
+    hmac.update(manifest);
+
+    const generatedHash = hmac.digest("hex");
+
+    return generatedHash === hash;
+  } catch (error) {
+    console.error("Error verificando webhook:", error);
+    return false;
+  }
+};
