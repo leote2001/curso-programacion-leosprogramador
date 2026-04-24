@@ -50,10 +50,11 @@ export function FAQSection() {
       </h2>
 
       <div className="max-w-3xl mx-auto space-y-4">
+        <FAQItem question="¿Cómo me inscribo al curso?" answer="Una vez que hacés clic en Preinscripción debés llenar el formulario y seleccionar a que edición del curso querés inscribirte. Al enviar el formulario recibirás un mail con un enlace de pago para abonar la inscripción. Luego de confirmado el pago te enviaremos un correo de confirmación." />
+        <FAQItem question="¿Qué métodos de pago puedo usar para abonar la inscripción?" answer="El curso se abona con Mercadopago (solo Argentina)." />
         {faqs.map((item, i) => (
           <FAQItem key={i} question={item.q} answer={item.a} />
         ))}
-        <FAQItem question="¿Cómo abono el curso?" answer="El curso se abona con Mercadopago (solo Argentina)." />
       </div>
     </section>
   );
