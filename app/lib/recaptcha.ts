@@ -12,7 +12,7 @@ export const checkRecaptcha = async (token: string, action: string) => {
         });
         const verifyResData = await verifyRes.json();
         console.log("recaptchaScore: " + verifyResData.score);
-        if (!verifyResData.success || verifyResData.score < 0.3 || verifyResData.action !== action) {
+        if (!verifyResData.success || verifyResData.score < 0.5 || verifyResData.action !== action) {
             return { success: false, error: "Actividad sospechosa detectada.", status: 403 };
         }
         return { success: true };
