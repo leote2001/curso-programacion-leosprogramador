@@ -19,7 +19,7 @@ export const sendMail = async (options: {
     try {
         // Al pasar ...options, Nodemailer recibe la propiedad 'html' correctamente
         await transporter.sendMail({ 
-            from: `"Curso Programación Desde Cero + IA - Leo S Programador" <${process.env.EMAIL_USER}>`, 
+            from: "Curso Programación Desde Cero + IA<tifloleo@gmail.com>", 
             ...options 
         });
         return { success: true, message: "Se envió email al estudiante." };
@@ -62,6 +62,9 @@ export const htmlTemplateWithPayLinks = (fullName: string, linkMP: string, cours
         <p style="font-size: 14px;">
             Whatsapp: <a href="https://wa.link/pxwg5p" target="_blank" style="color: #2563eb; text-decoration: underline;">+54 387 211 6552</a>
         </p>
+        <p style="font-size: 14px;">
+            <a target="_blank" href="mailto:tifloleo@gmail.com">tifloleo@gmail.com</a>
+        </p>
     </div>`;
 }
 
@@ -82,6 +85,9 @@ export const htmlTemplateForAnyEmail = (fullName: string, message: string) => {
         </p>
         <p style="font-size: 14px;">
             Whatsapp: <a href="https://wa.link/pxwg5p" target="_blank" style="color: #2563eb; text-decoration: underline;">+54 387 211 6552</a>
+        </p>
+        <p style="font-size: 14px;">
+            <a target="_blank" href="mailto:tifloleo@gmail.com">tifloleo@gmail.com</a>
         </p>
     </div>`;
 }
