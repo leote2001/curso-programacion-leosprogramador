@@ -3,7 +3,7 @@
 import { CreateCourseEditionInput, createCourseEditionSchema } from "../lib/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { axiosReq, priceWithDiscount } from "../constants";
+import { axiosReq, priceInDollars, priceWithDiscount } from "../constants";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 export default function CreateCourseEditionForm() {
@@ -12,7 +12,7 @@ export default function CreateCourseEditionForm() {
   const [error, setError] = useState<string[]>([]);
   const { register, handleSubmit, formState: { errors } } = useForm<CreateCourseEditionInput>({
     resolver: zodResolver(createCourseEditionSchema),
-    defaultValues: {priceUSD: 0, priceARS: priceWithDiscount, status: "upcoming", googleMeetUrl: "https://" }
+    defaultValues: {priceUSD: Number(priceInDollars), priceARS: priceWithDiscount, status: "upcoming", googleMeetUrl: "https://" }
   });
   const onSubmit = async (data: CreateCourseEditionInput) => {
     setError([]);

@@ -17,7 +17,7 @@ export default function UpdateCourseEditionForm({ courseEdition }: UpdateCourseE
     const [alert, setAlert] = useState("");
     const { register, handleSubmit, formState: { errors } } = useForm<UpdateCourseEditionInput>({
         resolver: zodResolver(updateCourseEditionSchema),
-        defaultValues: {...courseEdition, startDate: courseEdition.startDate.split("T")[0], endDate: courseEdition.endDate.split("T")[0], priceUSD: 0}
+        defaultValues: {...courseEdition, startDate: courseEdition.startDate.split("T")[0], endDate: courseEdition.endDate.split("T")[0]}
     });
     const onSubmit = async (data: UpdateCourseEditionInput) => {
         setAlert("");

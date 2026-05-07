@@ -39,7 +39,7 @@ export const getOpenCourseEditions = async () => {
         const gettingCourseEditions = await CourseEdition.find({ status: "open" }).lean();
         console.log("Se obtuvieron las cohortes con inscripciones abiertas.");
         if (gettingCourseEditions.length > 0) {
-            courseEditions = gettingCourseEditions.map(ce => ({ _id: ce._id, name: ce.name, startDate: new Date(ce.startDate).toLocaleDateString("es-AR", {timeZone: "utc", weekday: "long", day: "numeric", month: "long", year: "numeric"}), startTime: ce.startTime, priceARS: ce.priceARS}));
+            courseEditions = gettingCourseEditions.map(ce => ({ _id: ce._id, name: ce.name, startDate: new Date(ce.startDate).toLocaleDateString("es-AR", {timeZone: "utc", weekday: "long", day: "numeric", month: "long", year: "numeric"}), startTime: ce.startTime, priceARS: ce.priceARS, priceUSD: ce.priceUSD}));
         }
         return { success: true, message: "Se obtuvieron las cohortes con inscripciones abiertas.", courseEditions: JSON.parse(JSON.stringify(courseEditions)) };
     } catch (err: any) {
@@ -77,6 +77,7 @@ export const createInscription = async (formData: any, token: string) => {
         }
         if (openCourseEdition.studentsQuantity >= openCourseEdition.maxStudents) return { success: false, error: "No se puede realizar la preinscripción. Ya se alcanzó la cantidad de alumnos permitida para esta edición del curso.", status: 400 };
         let linkMP;
+        let linkPP;
         let newInscription;
         const expiresAt = new Date(); 
         console.log(`Expiracion en milisegundos: ${expiresAt}`);
@@ -86,13 +87,15 @@ export const createInscription = async (formData: any, token: string) => {
             Object.assign(alreadyEnrolled, inscriptionData);
             await alreadyEnrolled.save();
             linkMP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/mercadopago/pay-before?inscriptionId=${alreadyEnrolled._id}`;
+            linkPP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/paypal/pay-before?inscriptionId=${alreadyEnrolled._id}`;
             } else {
         newInscription = await Inscription.create(inscriptionData);
         linkMP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/mercadopago/pay-before?inscriptionId=${newInscription._id}`;
+        linkPP = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/paypal/pay-before?inscriptionId=${newInscription._id}`;
         }
-        const sendingPayLinkEmail = await sendMail({ to: data.email, subject: "Curso Programación Desde Cero + IA - Enlace de pago", html: htmlTemplateWithPayLinks(data.fullName, linkMP, openCourseEdition) });
-        if (!sendingPayLinkEmail.success) {
-            return { success: false, error: "Error al enviar email con enlace de pago.", status: 400 };
+        const sendingPayLinksEmail = await sendMail({ to: data.email, subject: "Curso Programación Desde Cero + IA - Enlaces de pago", html: htmlTemplateWithPayLinks(data.fullName, linkMP, linkPP, openCourseEdition) });
+        if (!sendingPayLinksEmail.success) {
+            return { success: false, error: "Error al enviar email con enlaces de pago.", status: 400 };
         }
         if (alreadyEnrolled) {
             console.log("Se volvió a activar la cuenta con mail "+alreadyEnrolled.email); 

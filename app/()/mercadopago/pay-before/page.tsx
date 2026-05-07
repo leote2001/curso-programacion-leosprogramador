@@ -47,7 +47,7 @@ export default async function CreateMPPayLink({ searchParams }: CreateMPPayLinkP
             return <h2>{error}</h2>
         }
     } catch (err: any) {
-        console.error("Error en página que crea link de pago de MP: " + err);
+        console.error("Error en página que crea link de pago de MP: ",err);
         error = "Error inesperado";
         return <h2>{error}</h2>
     }
