@@ -148,7 +148,7 @@ export default function Landing() {
       <p>${priceWithDiscount}ARS / ${coursePrice}ARS. Oferta por tiempo limitado!</p>
       <p>${priceInDollars} USD</p>
       <p>Pagás con Mercadopago (solo Argentina)</p>
-      <p>Pagás con Paypal (personas fuera de Argentina)</p>
+      <p>Pagás con Paypal (para pagos fuera de Argentina)</p>
       </section>
         {/* CTA */}
         <section className="py-20 px-6 text-center bg-blue-600">
