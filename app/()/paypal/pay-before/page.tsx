@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import ExpiredInscriptionError from "@/app/components/ExpiredInscriptionError";
 import { connectDb } from "@/app/lib/db";
 import { Inscription } from "@/app/lib/models/inscription.model";

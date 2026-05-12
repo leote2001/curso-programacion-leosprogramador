@@ -1,3 +1,5 @@
+/*eslint-disable*/
+import { baseUrl } from "../constants";
 export const getPPToken = async () => {
     const clientId = process.env.PP_CLIENT_ID;
     const clientSecret = process.env.PP_SECRET_KEY;
@@ -5,7 +7,7 @@ export const getPPToken = async () => {
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
     try {
-        const response = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
+        const response = await fetch(`${baseUrl}/v1/oauth2/token`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -16,12 +18,12 @@ export const getPPToken = async () => {
         });
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Error en la función que obtiene el token de paypal: ", errorData);
+            console.error("Error en la función que obtiene el token de paypal: ", JSON.stringify(errorData, null, 2));
             return { success: false, error: "Error con token de Paypal." };
         }
         const data = await response.json();
         return { success: true, token: data.access_token };
-    } catch (err) {
+    } catch (err: any) {
         console.error("Error crítico en fetch:", err);
         return { success: false, error: "Error de red" };
     }
@@ -42,14 +44,14 @@ export const createPPOrderAndReturnPayLink = async (inscriptionInfo: { inscripti
             amount: { currency_code: 'USD', value: unit_price }
         }],
         application_context: {
-            brand_name: "Leo S Programador",
+            brand_name: "Curso Programación Desde Cero + IA",
             landing_page: "LOGIN",
             user_action: "PAY_NOW",
             return_url: `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/paypal/success`,
-            cancel_url: `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/paypal/failure`
+            cancel_url: `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}`
         }
     }
-    const response = await fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
+    const response = await fetch(`${baseUrl}/v2/checkout/orders`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -80,7 +82,7 @@ export const verifyPPWebhook = async (body: any, headers: any) => {
         webhook_event: body,
     };
     try {
-        const response = await fetch("https://api-m.sandbox.paypal.com/v1/notifications/verify-webhook-signature", {
+        const response = await fetch(`${baseUrl}/v1/notifications/verify-webhook-signature`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -116,7 +118,7 @@ export const payCapture = async (paypalOrderId: string) => {
         return { success: false, error: "Error al obtener token." };
     }
     try {
-        const response = await fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${paypalOrderId}/capture`, {
+        const response = await fetch(`${baseUrl}/v2/checkout/orders/${paypalOrderId}/capture`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -130,5 +132,29 @@ export const payCapture = async (paypalOrderId: string) => {
         return { success: true, data: captureData };
     } catch (err: any) {
         return { success: false, error: "Error inesperado en función que captura el pago de paypal." };
+    }
+}
+export const refundPPPayment = async (captureId: string) => {
+    const { token, success } = await getPPToken();
+    if (!success) {
+        return { success: false, error: "Error al obtener token en función que hace refund de paypal." };
+    }
+    try {
+        const response = await fetch(`${baseUrl}/v2/payments/captures/${captureId}/refund`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "PayPal-Request-Id": `refund-${captureId}`,
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({})
+        });
+        const data = await response.json();
+        if (data.status !== "COMPLETED") {
+            return { success: false, error: "Error en función que hace refund. No fue posible devolver el dinero." };
+        }
+        return { success: true, data };
+    } catch (err: any) {
+        return { success: false, error: "Error inesperado en función que hace refund de paypal." };
     }
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { coursePrice, priceWithDiscount } from "../constants";
+import { coursePrice, priceInDollars, priceWithDiscount } from "../constants";
+import YoutubePlayer from "./YoutubePlayer";
 
 export default function Landing() {
   const router = useRouter();
@@ -57,6 +58,7 @@ export default function Landing() {
         <button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-2xl text-lg font-semibold shadow-lg" onClick={() => router.push("/preinscription")}>
             Preinscribirme ahora
           </button>
+          <YoutubePlayer videoSrc={"https://www.youtube.com/embed/tYvTW8N0Q8M?si=1HrGGuloOL-n0l7g" } />
 {/* TEMARIO */}
 <section className="py-16 px-6 max-w-5xl mx-auto">
         <h3 className="text-3xl md:text-4xl font-bold text-center mb-10">
@@ -144,7 +146,9 @@ export default function Landing() {
             Precio
           </h3>
       <p>${priceWithDiscount}ARS / ${coursePrice}ARS. Oferta por tiempo limitado!</p>
-      <p>Pagás con Mercadopago</p>
+      <p>${priceInDollars} USD</p>
+      <p>Pagás con Mercadopago (solo Argentina)</p>
+      <p>Pagás con Paypal (personas fuera de Argentina)</p>
       </section>
         {/* CTA */}
         <section className="py-20 px-6 text-center bg-blue-600">
